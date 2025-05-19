@@ -10,6 +10,12 @@ class ItemMediaInline(admin.TabularInline):
     readonly_fields = ("media_type", "preview")
     fields = ("media_url", "media_type", "preview",)
 
+    def preview(self, obj):
+        if obj.media_type == "image":
+            return format_html('<img src="{}" style="max-height:150px;"/>', obj.media_url.url)
+        return "-"
+    preview.short_description = "Preview"
+
 
 class StolenReportInline(admin.TabularInline):
     model = StolenReport
@@ -32,7 +38,7 @@ class ItemAdmin(admin.ModelAdmin):
 @admin.register(ItemMedia)
 class ItemMediaAdmin(admin.ModelAdmin):
     list_display = ("item", "media_type", "uploaded_at", "preview")
-    list_filter = ("media_type", "uploaded_at", "item__owner")
+    list_filter = ("uploaded_at", "item__owner")
     search_fields = ("item__name", "item__serial_number")
     readonly_fields = ("preview",)
     date_hierarchy = "uploaded_at"

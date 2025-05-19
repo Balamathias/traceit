@@ -42,8 +42,10 @@ class UserChangeForm(DjangoUserChangeForm):
             "email", "password", "first_name", "last_name", "username",
             "phone", "image", "metadata", "is_active", "is_staff",
             "is_superuser", "groups", "user_permissions",
-            "otp", "otp_created_at", "last_login", "date_joined",
+            "otp", "otp_created_at", "last_login",
         ]
+
+        # read_only_fields = ("last_login", "date_joined", "otp_created_at")
 
 
 @admin.register(User)

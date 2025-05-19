@@ -21,6 +21,7 @@ class ItemViewSet(ResponseMixin, viewsets.ModelViewSet):
     filterset_fields = ['owner', 'is_stolen']
     search_fields = ['name', 'serial_number', 'description']
     ordering_fields = ['created_at', 'name', 'serial_number']
+    lookup_field = 'id'
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -74,13 +75,19 @@ class ItemMediaViewSet(ResponseMixin, viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['item', 'media_type']
     ordering_fields = ['uploaded_at']
+    pagination_class = StackPagination
+    lookup_field = 'id'
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
         return self.response(
             data=serializer.data,
-            message="Item media list retrieved successfully"
+            message="Item media list retrieved successfully",
+            count=self.paginator.page.paginator.count,
+            next=self.paginator.get_next_link(),
+            previous=self.paginator.get_previous_link()
         )
 
     def retrieve(self, request, *args, **kwargs):
@@ -115,13 +122,19 @@ class StolenReportViewSet(ResponseMixin, viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['item', 'resolved']
     ordering_fields = ['report_date']
+    pagination_class = StackPagination
+    lookup_field = 'id'
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
         return self.response(
             data=serializer.data,
-            message="Stolen reports retrieved successfully"
+            message="Stolen reports retrieved successfully",
+            count=self.paginator.page.paginator.count,
+            next=self.paginator.get_next_link(),
+            previous=self.paginator.get_previous_link()
         )
 
     def retrieve(self, request, *args, **kwargs):
